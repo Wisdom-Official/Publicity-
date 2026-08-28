@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teenspace - Status & Story Take Reach and Win</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        pinkTheme: '#E6007E',
+                        pinkHover: '#C7006D',
+                        blueTheme: '#00AEEF',
+                        blueHover: '#0090C7'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @keyframes glowPulse {
+            0%, 100% { box-shadow: 0 0 25px rgba(230, 0, 126, 0.4); }
+            50% { box-shadow: 0 0 35px rgba(0, 174, 239, 0.6); }
+        }
+        .glow-box { animation: glowPulse 4s infinite ease-in-out; }
+
+        /* 3D Gift Box Opening CSS Animation */
+        .gift-box {
+            perspective: 1000px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .gift-box:hover { transform: translateY(-6px) scale(1.02); }
+        
+        .box-lid {
+            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-origin: top center;
+        }
+        .gift-box.opened .box-lid {
+            transform: rotateX(-120deg) translateY(-12px);
+            opacity: 0.3;
+        }
+
+        .prize-display {
+            opacity: 0;
+            transform: scale(0.6) translateY(20px);
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .gift-box.opened .prize-display {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+
+        .light-ray {
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        .gift-box.opened .light-ray {
+            opacity: 1;
+        }
+
+        /* Pulse ring for timer */
+        @keyframes timerBar {
+            from { width: 100%; }
+            to { width: 0%; }
+        }
+        .timer-progress {
+            animation: timerBar 25s linear forwards;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between selection:bg-pinkTheme selection:text-white">
+
+    <!-- Top Navigation Header -->
+    <header class="w-full bg-slate-900/80 backdrop-blur-md border-b border-slate-800 px-4 sm:px-8 py-3 flex items-center justify-between sticky top-0 z-40">
+        <div class="flex items-center gap-3">
+            <img src="0.png" alt="3 Space Logo" class="h-10 sm:h-12 object-contain" onerror="this.src='https://via.placeholder.com/150x50?text=3+Space'">
+        </div>
+        <button id="openTermsHeader" class="text-xs sm:text-sm text-blueTheme hover:text-cyan-300 font-semibold flex items-center gap-1.5 transition">
+            <i class="fa-solid fa-file-contract"></i> <span>Terms & Conditions</span>
+        </button>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-1 max-w-5xl mx-auto w-full p-4 my-4 space-y-8">
+
+        <!-- Hero Banner -->
+        <div class="text-center space-y-3">
+            <span class="inline-block px-4 py-1.5 bg-gradient-to-r from-pinkTheme/20 to-blueTheme/20 text-pinkTheme text-xs font-bold rounded-full border border-pinkTheme/30 shadow-sm">
+                Official Teenspace Publicity Campaign
+            </span>
+            <h1 class="text-3xl sm:text-5xl font-black text-white tracking-tight">
+                <span class="text-pinkTheme">Status</span> & <span class="text-blueTheme">Story</span> Contest
+            </h1>
+            <p class="text-slate-400 text-sm sm:text-base max-w-xl mx-auto">
+                Download today's poster, share it on WhatsApp/Instagram, and submit your reach screenshot to win!
+            </p>
+        </div>
+
+        <!-- Daily Status Poster & Phone Preview Demo Section -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-900/90 border border-slate-800 rounded-3xl p-6 shadow-2xl backdrop-blur-xl">
+            
+            <!-- Daily Poster Download Box -->
+            <div class="space-y-4 flex flex-col justify-between">
+                <div>
+                    <span class="px-3 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 text-xs font-bold rounded-full">
+                        📢 Today's Official Status Poster
+                    </span>
+                    <h3 class="text-xl font-bold text-white mt-2">1. Download & Share This Poster</h3>
+                    <p class="text-xs text-slate-400 mt-1">
+                        ഇന്നത്തെ സ്റ്റാറ്റസ് പോസ്റ്റർ താഴെ നൽകിയിരിക്കുന്നു. ഇത് ഡൗൺലോഡ് ചെയ്ത് നിങ്ങളുടെ വാട്‌സ്ആപ്പ് / ഇൻസ്റ്റാഗ്രാമിൽ പോസ്റ്റ് ചെയ്യുക.
+                    </p>
+                </div>
+
+                <div class="bg-slate-950 border border-slate-800 rounded-2xl p-3 flex items-center justify-center min-h-[220px]">
+                    <img id="dailyPosterImg" src="https://via.placeholder.com/600x800?text=Poster+Loading..." alt="Today Poster" class="max-h-64 object-contain rounded-xl shadow-lg">
+                </div>
+
+                <div class="space-y-2">
+                    <a id="downloadPosterBtn" href="#" download="Today_Status_Poster.jpg" target="_blank" class="w-full py-3 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black text-xs rounded-xl transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20">
+                        <i class="fa-solid fa-download"></i> Download Poster Image
+                    </a>
+                    <div id="captionContainer" class="hidden">
+                        <div class="flex items-center justify-between text-xs bg-slate-950 border border-slate-800 p-2.5 rounded-xl">
+                            <span id="captionText" class="truncate text-slate-300 pr-2"></span>
+                            <button id="copyCaptionBtn" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-blueTheme font-bold text-[11px] rounded-lg shrink-0">
+                                <i class="fa-regular fa-copy"></i> Copy Link
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Phone Frame Demo Guide Box -->
+            <div class="space-y-4 flex flex-col justify-between border-t md:border-t-0 md:border-l border-slate-800 pt-6 md:pt-0 md:pl-6">
+                <div>
+                    <span class="px-3 py-1 bg-pinkTheme/10 text-pinkTheme border border-pinkTheme/30 text-xs font-bold rounded-full">
+                        📱 Todaay Poster
+                    </span>
+                    <h3 class="text-xl font-bold text-white mt-2">2. Put Status & Win Prizes! </h3>
+                    <p class="text-xs text-slate-400 mt-1">
+                        </p>
+                </div>
+
+                <!-- Smartphone Visual Frame -->
+                <div class="mx-auto w-full max-w-[200px] bg-slate-950 border-4 border-slate-800 rounded-[32px] p-2 shadow-2xl relative overflow-hidden my-2">
+                    <div class="w-16 h-3 bg-slate-800 rounded-full mx-auto mb-2"></div>
+                    <div class="rounded-2xl overflow-hidden bg-slate-900 aspect-[9/16] flex items-center justify-center">
+                        <img id="demoPhoneImg" src="https://via.placeholder.com/300x530?text=Phone+Demo" alt="Phone Demo" class="w-full h-full object-cover">
+                    </div>
+                </div>
+
+                <div class="text-center bg-slate-950/60 p-3 rounded-2xl border border-slate-800/80">
+                    <p class="text-[11px] text-slate-400">
+                        <i class="fa-solid fa-circle-info text-blueTheme mr-1"></i> സ്റ്റാറ്റസ് വെച്ച് കുറഞ്ഞത് 24 മണിക്കൂറിനുള്ളിൽ സ്ക്രീൻഷോട്ട് എടുത്ത് താഴെ സബ്മിറ്റ് ചെയ്യുക.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Weekly Winners Section -->
+        <div id="winnersSection" class="bg-slate-900/80 border border-slate-800 rounded-3xl p-6 sm:p-8 backdrop-blur-xl relative overflow-hidden shadow-2xl">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-trophy text-amber-400"></i> Weekly Winners
+                    </h2>
+                    <p class="text-xs text-slate-400 mt-1">Top performers of the current week</p>
+                </div>
+                <span class="px-3 py-1 bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-bold rounded-full">
+                    This Week
+                </span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="winnersGrid">
+                <!-- 2nd Place -->
+                <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-4 flex items-center gap-4 relative overflow-hidden order-2 md:order-1">
+                    <div class="w-12 h-12 rounded-full bg-slate-400/10 border border-slate-400/30 flex items-center justify-center text-slate-300 font-black text-lg">
+                        🥈
+                    </div>
+                    <div>
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">2nd Place</span>
+                        <h4 class="font-bold text-white text-base" id="w2Name">Awaiting Winner</h4>
+                        <p class="text-xs text-emerald-400 font-semibold" id="w2Views">- views</p>
+                    </div>
+                </div>
+
+                <!-- 1st Place -->
+                <div class="bg-gradient-to-b from-amber-500/10 to-slate-950/80 border border-amber-500/30 rounded-2xl p-5 flex items-center gap-4 relative overflow-hidden order-1 md:order-2 shadow-lg shadow-amber-500/5">
+                    <div class="w-14 h-14 rounded-full bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-300 font-black text-2xl">
+                        🥇
+                    </div>
+                    <div>
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-amber-400">1st Place Winner</span>
+                        <h4 class="font-black text-amber-200 text-lg" id="w1Name">Awaiting Winner</h4>
+                        <p class="text-xs text-emerald-400 font-extrabold" id="w1Views">- views</p>
+                    </div>
+                </div>
+
+                <!-- 3rd Place -->
+                <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-4 flex items-center gap-4 relative overflow-hidden order-3">
+                    <div class="w-12 h-12 rounded-full bg-amber-700/10 border border-amber-700/30 flex items-center justify-center text-amber-600 font-black text-lg">
+                        🥉
+                    </div>
+                    <div>
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">3rd Place</span>
+                        <h4 class="font-bold text-white text-base" id="w3Name">Awaiting Winner</h4>
+                        <p class="text-xs text-emerald-400 font-semibold" id="w3Views">- views</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Interactive Mystery Prize Boxes -->
+        <div class="space-y-4">
+            <div class="text-center">
+                <h2 class="text-xl sm:text-2xl font-black text-white">🎁 Tap To Reveal Weekly Prizes!</h2>
+                <p class="text-xs text-slate-400 mt-1">Boxes will automatically close after 25 seconds</p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-2">
+                <!-- 2nd Prize Box -->
+                <div class="gift-box bg-slate-900/90 border border-slate-800 rounded-3xl p-6 text-center relative overflow-hidden flex flex-col items-center justify-between min-h-[260px]" id="box-2" data-prize="2">
+                    <div class="absolute inset-0 bg-gradient-to-b from-cyan-500/10 to-transparent light-ray pointer-events-none"></div>
+                    
+                    <div class="flex items-center justify-between w-full z-10">
+                        <span class="px-3 py-1 bg-slate-800 border border-slate-700 text-slate-300 text-xs font-bold rounded-full">2nd Prize</span>
+                        <span class="timer-tag text-[10px] text-cyan-400 font-bold hidden"><i class="fa-regular fa-clock mr-1"></i><span class="seconds-count">25</span>s</span>
+                    </div>
+                    
+                    <!-- Cover / Unopened View -->
+                    <div class="my-4 relative z-10 box-cover">
+                        <div class="text-6xl transition-transform duration-500 box-lid">📦</div>
+                        <div class="text-xs text-cyan-400 font-semibold mt-3 click-hint">Tap to Open</div>
+                    </div>
+
+                    <!-- Revealed Prize View -->
+                    <div class="prize-display hidden z-10 space-y-2 my-auto w-full">
+                        <div class="w-24 h-24 mx-auto flex items-center justify-center relative">
+                            <img id="prize2Img" src="" alt="2nd Prize PNG" class="max-h-24 max-w-24 object-contain drop-shadow-[0_10px_10px_rgba(0,174,239,0.4)] hidden">
+                            <span id="prize2FallbackIcon" class="text-5xl">🥈</span>
+                        </div>
+                        <h3 class="font-extrabold text-white text-base leading-tight" id="prize2Text">Mystery Gift</h3>
+                    </div>
+
+                    <!-- Reset progress bar timer -->
+                    <div class="timer-bar-wrapper w-full bg-slate-800 rounded-full h-1 overflow-hidden hidden z-10 mt-2">
+                        <div class="timer-bar bg-cyan-400 h-1 rounded-full w-full"></div>
+                    </div>
+                </div>
+
+                <!-- 1st Prize Box -->
+                <div class="gift-box bg-gradient-to-b from-slate-900 to-slate-950 border-2 border-pinkTheme/50 rounded-3xl p-6 text-center relative overflow-hidden flex flex-col items-center justify-between min-h-[280px] glow-box shadow-2xl" id="box-1" data-prize="1">
+                    <div class="absolute inset-0 bg-gradient-to-b from-pinkTheme/20 to-transparent light-ray pointer-events-none"></div>
+                    
+                    <div class="flex items-center justify-between w-full z-10">
+                        <span class="px-4 py-1.5 bg-pinkTheme text-white text-xs font-black rounded-full shadow-lg">1st Mega Prize</span>
+                        <span class="timer-tag text-[10px] text-pinkTheme font-bold hidden"><i class="fa-regular fa-clock mr-1"></i><span class="seconds-count">25</span>s</span>
+                    </div>
+                    
+                    <!-- Cover / Unopened View -->
+                    <div class="my-4 relative z-10 box-cover">
+                        <div class="text-7xl transition-transform duration-500 box-lid">🎁</div>
+                        <div class="text-xs text-pinkTheme font-bold mt-3 click-hint">Tap to Open</div>
+                    </div>
+
+                    <!-- Revealed Prize View -->
+                    <div class="prize-display hidden z-10 space-y-2 my-auto w-full">
+                        <div class="w-28 h-28 mx-auto flex items-center justify-center relative">
+                            <img id="prize1Img" src="" alt="1st Prize PNG" class="max-h-28 max-w-28 object-contain drop-shadow-[0_10px_15px_rgba(230,0,126,0.5)] hidden">
+                            <span id="prize1FallbackIcon" class="text-6xl">🥇</span>
+                        </div>
+                        <h3 class="font-black text-amber-300 text-lg leading-tight" id="prize1Text">Grand Mystery Prize</h3>
+                    </div>
+
+                    <!-- Reset progress bar timer -->
+                    <div class="timer-bar-wrapper w-full bg-slate-800 rounded-full h-1 overflow-hidden hidden z-10 mt-2">
+                        <div class="timer-bar bg-pinkTheme h-1 rounded-full w-full"></div>
+                    </div>
+                </div>
+
+                <!-- 3rd Prize Box -->
+                <div class="gift-box bg-slate-900/90 border border-slate-800 rounded-3xl p-6 text-center relative overflow-hidden flex flex-col items-center justify-between min-h-[260px]" id="box-3" data-prize="3">
+                    <div class="absolute inset-0 bg-gradient-to-b from-amber-500/10 to-transparent light-ray pointer-events-none"></div>
+                    
+                    <div class="flex items-center justify-between w-full z-10">
+                        <span class="px-3 py-1 bg-slate-800 border border-slate-700 text-slate-300 text-xs font-bold rounded-full">3rd Prize</span>
+                        <span class="timer-tag text-[10px] text-amber-400 font-bold hidden"><i class="fa-regular fa-clock mr-1"></i><span class="seconds-count">25</span>s</span>
+                    </div>
+                    
+                    <!-- Cover / Unopened View -->
+                    <div class="my-4 relative z-10 box-cover">
+                        <div class="text-6xl transition-transform duration-500 box-lid">📦</div>
+                        <div class="text-xs text-amber-400 font-semibold mt-3 click-hint">Tap to Open</div>
+                    </div>
+
+                    <!-- Revealed Prize View -->
+                    <div class="prize-display hidden z-10 space-y-2 my-auto w-full">
+                        <div class="w-24 h-24 mx-auto flex items-center justify-center relative">
+                            <img id="prize3Img" src="" alt="3rd Prize PNG" class="max-h-24 max-w-24 object-contain drop-shadow-[0_10px_10px_rgba(245,158,11,0.4)] hidden">
+                            <span id="prize3FallbackIcon" class="text-5xl">🥉</span>
+                        </div>
+                        <h3 class="font-extrabold text-white text-base leading-tight" id="prize3Text">Special Gift</h3>
+                    </div>
+
+                    <!-- Reset progress bar timer -->
+                    <div class="timer-bar-wrapper w-full bg-slate-800 rounded-full h-1 overflow-hidden hidden z-10 mt-2">
+                        <div class="timer-bar bg-amber-400 h-1 rounded-full w-full"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Submission Form -->
+        <div class="max-w-xl mx-auto bg-slate-900/90 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+            <div class="text-center mb-6">
+                <h2 class="text-2xl font-black text-white">Submit Your Reach</h2>
+                <p class="text-slate-400 text-xs mt-1">Fill in the details below to log today's views</p>
+            </div>
+
+            <form id="contestForm" class="space-y-4">
+                <div>
+                    <label for="name" class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">Full Name</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400">
+                            <i class="fa-regular fa-user"></i>
+                        </span>
+                        <input type="text" id="name" required placeholder="Enter your full name" class="w-full pl-10 pr-4 py-3 bg-slate-950 border border-slate-800 rounded-xl focus:outline-none focus:border-pinkTheme text-sm">
+                    </div>
+                </div>
+
+                <div>
+                    <label for="phone" class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">WhatsApp Phone Number</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400">
+                            <i class="fa-brands fa-whatsapp text-emerald-400"></i>
+                        </span>
+                        <input type="tel" id="phone" required pattern="[0-9]{10}" placeholder="10-digit WhatsApp phone number" class="w-full pl-10 pr-4 py-3 bg-slate-950 border border-slate-800 rounded-xl focus:outline-none focus:border-pinkTheme text-sm">
+                    </div>
+                </div>
+
+                <div>
+                    <label for="platform" class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">Social Platform</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400">
+                            <i class="fa-solid fa-share-nodes"></i>
+                        </span>
+                        <select id="platform" required class="w-full pl-10 pr-4 py-3 bg-slate-950 border border-slate-800 rounded-xl focus:outline-none focus:border-blueTheme text-sm text-slate-200">
+                            <option value="WhatsApp">WhatsApp Status</option>
+                            <option value="Instagram">Instagram Story</option>
+                            <option value="Facebook">Facebook Story</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label for="views" class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">Views Count</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400">
+                            <i class="fa-regular fa-eye"></i>
+                        </span>
+                        <input type="number" id="views" required min="1" placeholder="e.g. 250" class="w-full pl-10 pr-4 py-3 bg-slate-950 border border-slate-800 rounded-xl focus:outline-none focus:border-blueTheme text-sm">
+                    </div>
+                </div>
+
+                <div>
+                    <label for="proofFile" class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">Screenshot or Screen Recording</label>
+                    <input type="file" id="proofFile" accept="image/*,video/*" required class="block w-full text-xs text-slate-400 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blueTheme/20 file:text-blueTheme hover:file:bg-blueTheme/30 cursor-pointer border border-slate-800 rounded-xl bg-slate-950 p-1">
+                </div>
+
+                <!-- Upload Progress Bar -->
+                <div id="progressContainer" class="hidden space-y-2 pt-2">
+                    <div class="flex justify-between text-xs text-slate-400 font-medium">
+                        <span id="progressText">Uploading proof...</span>
+                        <span id="progressPercent">0%</span>
+                    </div>
+                    <div class="w-full bg-slate-800 rounded-full h-2 overflow-hidden border border-slate-700">
+                        <div id="progressBar" class="bg-gradient-to-r from-pinkTheme to-blueTheme h-2 rounded-full transition-all duration-300 w-0"></div>
+                    </div>
+                </div>
+
+                <button type="submit" id="submitBtn" class="w-full py-3.5 px-4 bg-gradient-to-r from-pinkTheme to-blueTheme hover:opacity-90 text-white font-bold text-sm rounded-xl transition duration-200 shadow-lg shadow-pinkTheme/20 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-paper-plane"></i> Submit Entry
+                </button>
+            </form>
+
+            <div id="statusMsg" class="mt-4 text-center text-xs sm:text-sm font-semibold hidden"></div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center py-4 text-xs text-slate-500 border-t border-slate-900">
+        © 2026 Teenspace Campaign. All Rights Reserved.
+    </footer>
+
+    <!-- Terms & Conditions Modal -->
+    <div id="termsModal" class="fixed inset-0 bg-black/85 backdrop-blur-md hidden z-50 flex items-center justify-center p-4">
+        <div class="relative max-w-lg w-full bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 max-h-[85vh] overflow-y-auto shadow-2xl">
+            <button id="closeTermsModal" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg bg-slate-800 w-8 h-8 rounded-full flex items-center justify-center">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="flex items-center gap-2 mb-4 text-pinkTheme font-bold text-lg">
+                <i class="fa-solid fa-shield-halved"></i> <h2>Terms & Conditions</h2>
+            </div>
+            <div class="space-y-3 text-xs sm:text-sm text-slate-300 leading-relaxed">
+                <p>1. <b>Daily Submission Limit:</b> Only one entry per WhatsApp phone number is allowed per day.</p>
+                <p>2. <b>Proof Submission:</b> Authentic proof (Screenshot or 5-10 second screen recording) showing status/story viewers count is mandatory.</p>
+                <p>3. <b>Disqualification:</b> Any edited or AI-generated screenshots will result in immediate disqualification.</p>
+                <p>4. <b>Final Authority:</b> The decision of the Teenspace organizing team will be final for declaring winners.</p>
+            </div>
+            <div class="mt-6">
+                <button id="acceptTermsBtn" class="w-full py-3 bg-blueTheme hover:bg-blueHover text-white font-bold text-sm rounded-xl transition">
+                    I Understand
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, getDoc, doc, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDaW9pEGj_SqiM7VA0wfjtbJlMsQg1e-RI",
+            authDomain: "publicity-d156b.firebaseapp.com",
+            projectId: "publicity-d156b",
+            storageBucket: "publicity-d156b.firebasestorage.app",
+            messagingSenderId: "705576407513",
+            appId: "1:705576407513:web:d67ff4dbcda6ad7a4e49c8"
+        };
+
+        const CLOUD_NAME = "guqmosat";
+        const UPLOAD_PRESET = "dvtnmwnx";
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const form = document.getElementById('contestForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const statusMsg = document.getElementById('statusMsg');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressBar = document.getElementById('progressBar');
+        const progressPercent = document.getElementById('progressPercent');
+
+        const termsModal = document.getElementById('termsModal');
+        const openTermsHeader = document.getElementById('openTermsHeader');
+        const closeTermsModal = document.getElementById('closeTermsModal');
+        const acceptTermsBtn = document.getElementById('acceptTermsBtn');
+
+        openTermsHeader.addEventListener('click', () => termsModal.classList.remove('hidden'));
+        closeTermsModal.addEventListener('click', () => termsModal.classList.add('hidden'));
+        acceptTermsBtn.addEventListener('click', () => termsModal.classList.add('hidden'));
+
+        // Load Dynamic Data
+        async function loadCampaignData() {
+            try {
+                // Fetch Daily Poster Config
+                const dailySnap = await getDoc(doc(db, "admin_settings", "daily_poster"));
+                if (dailySnap.exists()) {
+                    const data = dailySnap.data();
+                    if (data.posterUrl) {
+                        document.getElementById('dailyPosterImg').src = data.posterUrl;
+                        document.getElementById('downloadPosterBtn').href = data.posterUrl;
+                    }
+                    if (data.demoPhoneUrl) {
+                        document.getElementById('demoPhoneImg').src = data.demoPhoneUrl;
+                    }
+                    if (data.caption) {
+                        document.getElementById('captionContainer').classList.remove('hidden');
+                        document.getElementById('captionText').innerText = data.caption;
+                        document.getElementById('copyCaptionBtn').addEventListener('click', () => {
+                            navigator.clipboard.writeText(data.caption);
+                            alert("Link copied to clipboard!");
+                        });
+                    }
+                }
+
+                // Fetch Prize Config with PNG Images
+                const prizeSnap = await getDoc(doc(db, "admin_settings", "prizes"));
+                if (prizeSnap.exists()) {
+                    const data = prizeSnap.data();
+                    if (data.prize1) document.getElementById('prize1Text').innerText = data.prize1;
+                    if (data.prize2) document.getElementById('prize2Text').innerText = data.prize2;
+                    if (data.prize3) document.getElementById('prize3Text').innerText = data.prize3;
+
+                    // Set PNG Images if uploaded by Admin
+                    if (data.prize1Img) {
+                        const img = document.getElementById('prize1Img');
+                        img.src = data.prize1Img;
+                        img.classList.remove('hidden');
+                        document.getElementById('prize1FallbackIcon').classList.add('hidden');
+                    }
+                    if (data.prize2Img) {
+                        const img = document.getElementById('prize2Img');
+                        img.src = data.prize2Img;
+                        img.classList.remove('hidden');
+                        document.getElementById('prize2FallbackIcon').classList.add('hidden');
+                    }
+                    if (data.prize3Img) {
+                        const img = document.getElementById('prize3Img');
+                        img.src = data.prize3Img;
+                        img.classList.remove('hidden');
+                        document.getElementById('prize3FallbackIcon').classList.add('hidden');
+                    }
+                }
+
+                // Fetch Winners Config
+                const winnerSnap = await getDoc(doc(db, "admin_settings", "winners"));
+                if (winnerSnap.exists()) {
+                    const data = winnerSnap.data();
+                    if (data.w1Name) {
+                        document.getElementById('w1Name').innerText = data.w1Name;
+                        document.getElementById('w1Views').innerText = `${data.w1Views || 0} views`;
+                    }
+                    if (data.w2Name) {
+                        document.getElementById('w2Name').innerText = data.w2Name;
+                        document.getElementById('w2Views').innerText = `${data.w2Views || 0} views`;
+                    }
+                    if (data.w3Name) {
+                        document.getElementById('w3Name').innerText = data.w3Name;
+                        document.getElementById('w3Views').innerText = `${data.w3Views || 0} views`;
+                    }
+                }
+            } catch (err) {
+                console.error("Error loading campaign data:", err);
+            }
+        }
+
+        loadCampaignData();
+
+        // Interactive Gift Box Logic with 25-Second Auto-Reset
+        const resetTimers = {};
+
+        function resetBox(box) {
+            box.classList.remove('opened');
+            box.querySelector('.box-cover').classList.remove('hidden');
+            box.querySelector('.prize-display').classList.add('hidden');
+            
+            const timerTag = box.querySelector('.timer-tag');
+            const timerWrapper = box.querySelector('.timer-bar-wrapper');
+            if (timerTag) timerTag.classList.add('hidden');
+            if (timerWrapper) timerWrapper.classList.add('hidden');
+
+            const boxId = box.id;
+            if (resetTimers[boxId]) {
+                clearInterval(resetTimers[boxId].interval);
+                clearTimeout(resetTimers[boxId].timeout);
+                delete resetTimers[boxId];
+            }
+        }
+
+        document.querySelectorAll('.gift-box').forEach(box => {
+            box.addEventListener('click', () => {
+                if (!box.classList.contains('opened')) {
+                    box.classList.add('opened');
+                    box.querySelector('.box-cover').classList.add('hidden');
+                    box.querySelector('.prize-display').classList.remove('hidden');
+
+                    const timerTag = box.querySelector('.timer-tag');
+                    const timerWrapper = box.querySelector('.timer-bar-wrapper');
+                    const timerBar = box.querySelector('.timer-bar');
+                    const secondsSpan = box.querySelector('.seconds-count');
+
+                    if (timerTag) timerTag.classList.remove('hidden');
+                    if (timerWrapper) timerWrapper.classList.remove('hidden');
+
+                    // Reset timer bar animation
+                    if (timerBar) {
+                        timerBar.classList.remove('timer-progress');
+                        void timerBar.offsetWidth; // trigger reflow
+                        timerBar.classList.add('timer-progress');
+                    }
+
+                    // Confetti trigger
+                    confetti({ particleCount: 90, spread: 70, origin: { y: 0.6 } });
+
+                    // 25 Seconds Countdown timer & Auto Reset
+                    let remainingSeconds = 25;
+                    if (secondsSpan) secondsSpan.innerText = remainingSeconds;
+
+                    const boxId = box.id;
+                    if (resetTimers[boxId]) {
+                        clearInterval(resetTimers[boxId].interval);
+                        clearTimeout(resetTimers[boxId].timeout);
+                    }
+
+                    const interval = setInterval(() => {
+                        remainingSeconds--;
+                        if (secondsSpan) secondsSpan.innerText = remainingSeconds;
+                        if (remainingSeconds <= 0) {
+                            clearInterval(interval);
+                        }
+                    }, 1000);
+
+                    const timeout = setTimeout(() => {
+                        resetBox(box);
+                    }, 25000);
+
+                    resetTimers[boxId] = { interval, timeout };
+                }
+            });
+        });
+
+        // Form Submission Logic
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const phone = document.getElementById('phone').value.trim();
+            const name = document.getElementById('name').value.trim();
+            const platform = document.getElementById('platform').value;
+            const views = parseInt(document.getElementById('views').value);
+            const fileInput = document.getElementById('proofFile');
+            const file = fileInput.files[0];
+
+            submitBtn.disabled = true;
+            submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            statusMsg.classList.add('hidden');
+
+            try {
+                const startOfDay = new Date(); startOfDay.setHours(0,0,0,0);
+                const endOfDay = new Date(); endOfDay.setHours(23,59,59,999);
+
+                const phoneCheckQuery = query(collection(db, "contest_entries"), where("phone", "==", phone));
+                const querySnap = await getDocs(phoneCheckQuery);
+                let alreadySubmittedToday = false;
+
+                querySnap.forEach(docSnap => {
+                    const data = docSnap.data();
+                    if (data.timestamp) {
+                        const entryDate = data.timestamp.toDate();
+                        if (entryDate >= startOfDay && entryDate <= endOfDay) alreadySubmittedToday = true;
+                    }
+                });
+
+                if (alreadySubmittedToday) {
+                    throw new Error("An entry has already been submitted for this phone number today!");
+                }
+
+                progressContainer.classList.remove('hidden');
+
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('upload_preset', UPLOAD_PRESET);
+
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/auto/upload`, true);
+
+                xhr.upload.onprogress = (e) => {
+                    if (e.lengthComputable) {
+                        const percent = Math.round((e.loaded / e.total) * 100);
+                        progressBar.style.width = `${percent}%`;
+                        progressPercent.innerText = `${percent}%`;
+                    }
+                };
+
+                const uploadPromise = new Promise((resolve, reject) => {
+                    xhr.onload = () => {
+                        if (xhr.status === 200) resolve(JSON.parse(xhr.responseText).secure_url);
+                        else reject(new Error("File upload failed."));
+                    };
+                    xhr.onerror = () => reject(new Error("Network error during file upload."));
+                });
+
+                xhr.send(formData);
+                const mediaUrl = await uploadPromise;
+                const isVideo = file.type.startsWith('video');
+
+                await addDoc(collection(db, "contest_entries"), {
+                    name, phone, platform, views, proofUrl: mediaUrl,
+                    fileType: isVideo ? 'video' : 'image',
+                    timestamp: serverTimestamp()
+                });
+
+                statusMsg.className = "mt-4 text-center text-xs sm:text-sm font-semibold p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 block";
+                statusMsg.innerText = "🎉 Entry submitted successfully! Good luck!";
+                form.reset();
+
+            } catch (error) {
+                statusMsg.className = "mt-4 text-center text-xs sm:text-sm font-semibold p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 block";
+                statusMsg.innerText = "❌ " + error.message;
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                setTimeout(() => {
+                    progressContainer.classList.add('hidden');
+                    progressBar.style.width = '0%';
+                }, 1000);
+            }
+        });
+    </script>
+</body>
+  </html>
