@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3 Space - Admin Control Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        pinkTheme: '#E6007E',
+                        blueTheme: '#00AEEF'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen">
+
+    <!-- Header -->
+    <header class="w-full bg-slate-900/80 backdrop-blur-md border-b border-slate-800 px-6 py-4 flex items-center justify-between sticky top-0 z-40">
+        <div class="flex items-center gap-3">
+            <img src="0.png" alt="Logo" class="h-10 object-contain" onerror="this.src='https://via.placeholder.com/120x40?text=3+Space'">
+            <span class="text-xs font-bold px-2.5 py-1 bg-slate-800 border border-slate-700 rounded-lg text-slate-300">Admin Panel</span>
+        </div>
+        <button id="logoutBtn" class="hidden px-4 py-2 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 text-xs font-bold rounded-xl transition">
+            <i class="fa-solid fa-right-from-bracket mr-1"></i> Logout
+        </button>
+    </header>
+
+    <div class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+
+        <!-- Login Card -->
+        <div id="loginCard" class="max-w-md mx-auto mt-16 bg-slate-900/90 border border-slate-800 rounded-3xl p-8 shadow-2xl backdrop-blur-xl relative overflow-hidden">
+            <div class="text-center mb-6">
+                <div class="w-12 h-12 bg-gradient-to-tr from-pinkTheme to-blueTheme rounded-2xl flex items-center justify-center mx-auto mb-3 text-white text-xl shadow-lg">
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-white">Admin Authentication</h2>
+                <p class="text-slate-400 text-xs mt-1">Enter password configured in Firebase</p>
+            </div>
+
+            <form id="loginForm" class="space-y-4">
+                <div>
+                    <input type="password" id="adminPassword" placeholder="Enter Admin Password" required class="w-full px-4 py-3 bg-slate-950 border border-slate-700 rounded-xl focus:outline-none focus:border-pinkTheme text-sm">
+                </div>
+                <button type="submit" id="loginBtn" class="w-full py-3.5 bg-gradient-to-r from-pinkTheme to-blueTheme hover:opacity-90 text-white font-bold text-sm rounded-xl transition shadow-lg shadow-pinkTheme/20">
+                    Login Dashboard
+                </button>
+                <p id="loginError" class="text-rose-400 text-xs text-center font-semibold mt-2 min-h-[1rem]"></p>
+            </form>
+        </div>
+
+        <!-- Dashboard Content -->
+        <div id="dashboard" class="hidden space-y-8">
+            
+            <!-- Header Bar -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-900/60 border border-slate-800 p-6 rounded-3xl backdrop-blur-lg">
+                <div>
+                    <h1 class="text-xl sm:text-2xl font-black text-white flex items-center gap-2">
+                        📊 3 Space Admin Control
+                    </h1>
+                    <p class="text-slate-400 text-xs mt-1">Upload posters directly, configure prize PNGs & manage contest entries</p>
+                </div>
+                <button id="refreshBtn" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white text-xs font-bold rounded-xl transition flex items-center gap-2 w-fit">
+                    <i class="fa-solid fa-rotate-right"></i> Refresh Data
+                </button>
+            </div>
+
+            <!-- Management Tools Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+                <!-- 1. Direct File Upload for Daily Poster & Demo -->
+                <div class="bg-slate-900/60 border border-slate-800 p-6 rounded-3xl space-y-4">
+                    <div class="flex items-center gap-2 text-emerald-400 font-bold">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> <h3>Upload Daily Poster & Demo</h3>
+                    </div>
+                    <form id="dailyConfigForm" class="space-y-4">
+                        <div>
+                            <label class="text-xs font-semibold text-slate-300 block mb-1">Select Daily Poster Image</label>
+                            <input type="file" id="posterFileInput" accept="image/*" class="block w-full text-xs text-slate-400 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-emerald-500/20 file:text-emerald-400 hover:file:bg-emerald-500/30 cursor-pointer border border-slate-800 rounded-xl bg-slate-950 p-1">
+                            <div id="posterPreviewContainer" class="mt-2 hidden flex items-center gap-2 bg-slate-950 p-2 rounded-xl border border-slate-800">
+                                <img id="posterPreviewImg" src="" class="h-10 w-10 object-cover rounded-lg">
+                                <span class="text-[11px] text-slate-400">Active Poster</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="text-xs font-semibold text-slate-300 block mb-1">Select Phone Demo Image</label>
+                            <input type="file" id="demoPhoneFileInput" accept="image/*" class="block w-full text-xs text-slate-400 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blueTheme/20 file:text-blueTheme hover:file:bg-blueTheme/30 cursor-pointer border border-slate-800 rounded-xl bg-slate-950 p-1">
+                            <div id="demoPreviewContainer" class="mt-2 hidden flex items-center gap-2 bg-slate-950 p-2 rounded-xl border border-slate-800">
+                                <img id="demoPreviewImg" src="" class="h-10 w-10 object-cover rounded-lg">
+                                <span class="text-[11px] text-slate-400">Active Demo Frame</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="text-xs font-semibold text-slate-300 block mb-1">Promotional Caption / Link</label>
+                            <textarea id="captionInput" rows="2" placeholder="Text or promo link users should copy..." class="w-full px-3.5 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-200 focus:outline-none focus:border-emerald-500"></textarea>
+                        </div>
+
+                        <button type="submit" id="saveDailyBtn" class="w-full py-2.5 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold text-xs rounded-xl transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-paper-plane"></i> Publish Poster & Demo
+                        </button>
+                    </form>
+                </div>
+
+                <!-- 2. Configure Prizes & Prize PNG Images -->
+                <div class="bg-slate-900/60 border border-slate-800 p-6 rounded-3xl space-y-4">
+                    <div class="flex items-center gap-2 text-pinkTheme font-bold">
+                        <i class="fa-solid fa-gift"></i> <h3>Prizes & Gift PNG Images</h3>
+                    </div>
+                    <form id="prizeForm" class="space-y-3">
+                        <!-- 1st Prize -->
+                        <div>
+                            <label class="text-xs font-semibold text-slate-400">1st Prize Title & PNG</label>
+                            <input type="text" id="prize1Input" placeholder="e.g. Smart Watch / ₹5000" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs">
+                            <input type="file" id="prize1ImgInput" accept="image/*" class="mt-1 block w-full text-[11px] text-slate-400 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:bg-pinkTheme/20 file:text-pinkTheme">
+                        </div>
+
+                        <!-- 2nd Prize -->
+                        <div>
+                            <label class="text-xs font-semibold text-slate-400">2nd Prize Title & PNG</label>
+                            <input type="text" id="prize2Input" placeholder="e.g. Wireless Earbuds" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs">
+                            <input type="file" id="prize2ImgInput" accept="image/*" class="mt-1 block w-full text-[11px] text-slate-400 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:bg-blueTheme/20 file:text-blueTheme">
+                        </div>
+
+                        <!-- 3rd Prize -->
+                        <div>
+                            <label class="text-xs font-semibold text-slate-400">3rd Prize Title & PNG</label>
+                            <input type="text" id="prize3Input" placeholder="e.g. Gift Voucher" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs">
+                            <input type="file" id="prize3ImgInput" accept="image/*" class="mt-1 block w-full text-[11px] text-slate-400 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:bg-amber-500/20 file:text-amber-400">
+                        </div>
+
+                        <button type="submit" id="savePrizesBtn" class="w-full py-2.5 bg-pinkTheme hover:bg-pinkHover text-white font-bold text-xs rounded-xl transition">
+                            Save Prizes & PNGs
+                        </button>
+                    </form>
+                </div>
+
+                <!-- 3. Declare Winners -->
+                <div class="bg-slate-900/60 border border-slate-800 p-6 rounded-3xl space-y-4">
+                    <div class="flex items-center gap-2 text-blueTheme font-bold">
+                        <i class="fa-solid fa-trophy"></i> <h3>Declare Winners</h3>
+                    </div>
+                    <form id="winnerForm" class="space-y-3">
+                        <div class="grid grid-cols-2 gap-2">
+                            <input type="text" id="w1NameInput" placeholder="1st Winner Name" class="px-3.5 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs">
+                            <input type="number" id="w1ViewsInput" placeholder="1st Views" class="px-3.5 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs">
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <input type="text" id="w2NameInput" placeholder="2nd Winner Name" class="px-3.5 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs">
+                            <input type="number" id="w2ViewsInput" placeholder="2nd Views" class="px-3.5 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs">
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <input type="text" id="w3NameInput" placeholder="3rd Winner Name" class="px-3.5 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs">
+                            <input type="number" id="w3ViewsInput" placeholder="3rd Views" class="px-3.5 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs">
+                        </div>
+                        <button type="submit" class="w-full py-2.5 bg-blueTheme hover:bg-blueHover text-white font-bold text-xs rounded-xl transition">
+                            Publish Winners
+                        </button>
+                    </form>
+                </div>
+
+            </div>
+
+            <!-- Entries Leaderboard Table -->
+            <div class="bg-slate-900/60 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl backdrop-blur-lg">
+                <div class="p-4 border-b border-slate-800 flex items-center justify-between">
+                    <h3 class="font-bold text-sm text-white">Submitted Entries</h3>
+                    <span id="statTotal" class="text-xs bg-slate-800 text-slate-300 font-bold px-2.5 py-1 rounded-full">0 Entries</span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-950/80 border-b border-slate-800 text-slate-400 text-xs uppercase tracking-wider">
+                                <th class="p-4">Rank</th>
+                                <th class="p-4">Name</th>
+                                <th class="p-4">WhatsApp</th>
+                                <th class="p-4">Platform</th>
+                                <th class="p-4">Views</th>
+                                <th class="p-4">Proof</th>
+                                <th class="p-4">Time</th>
+                                <th class="p-4 text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody" class="divide-y divide-slate-800/60 text-sm">
+                            <tr>
+                                <td colspan="8" class="p-8 text-center text-slate-400">Loading...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Media Preview Modal -->
+    <div id="mediaModal" class="fixed inset-0 bg-black/85 backdrop-blur-md hidden z-50 flex items-center justify-center p-4">
+        <div class="relative max-w-3xl w-full bg-slate-900 border border-slate-800 rounded-3xl p-4 overflow-hidden shadow-2xl">
+            <button id="closeModal" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg bg-slate-800/80 w-9 h-9 rounded-full flex items-center justify-center z-10">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div id="modalContent" class="flex items-center justify-center max-h-[80vh] overflow-hidden"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, getDoc, setDoc, doc, query, orderBy, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDaW9pEGj_SqiM7VA0wfjtbJlMsQg1e-RI",
+            authDomain: "publicity-d156b.firebaseapp.com",
+            projectId: "publicity-d156b",
+            storageBucket: "publicity-d156b.firebasestorage.app",
+            messagingSenderId: "705576407513",
+            appId: "1:705576407513:web:d67ff4dbcda6ad7a4e49c8"
+        };
+
+        const CLOUD_NAME = "guqmosat";
+        const UPLOAD_PRESET = "dvtnmwnx";
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const loginCard = document.getElementById('loginCard');
+        const dashboard = document.getElementById('dashboard');
+        const loginForm = document.getElementById('loginForm');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const refreshBtn = document.getElementById('refreshBtn');
+        const adminPasswordInput = document.getElementById('adminPassword');
+        const loginError = document.getElementById('loginError');
+        const tableBody = document.getElementById('tableBody');
+        const mediaModal = document.getElementById('mediaModal');
+        const modalContent = document.getElementById('modalContent');
+        const closeModal = document.getElementById('closeModal');
+
+        let currentPosterUrl = "";
+        let currentDemoPhoneUrl = "";
+        let currentPrize1Img = "";
+        let currentPrize2Img = "";
+        let currentPrize3Img = "";
+
+        if (sessionStorage.getItem('adminLoggedIn') === 'true') {
+            showDashboard();
+        }
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const enteredPass = adminPasswordInput.value.trim();
+            loginError.innerText = "Checking password...";
+
+            try {
+                let correctPassword = null;
+                try {
+                    const adminDocRef = doc(db, "admin_settings", "credentials");
+                    const adminDocSnap = await getDoc(adminDocRef);
+                    if (adminDocSnap.exists() && adminDocSnap.data().password) {
+                        correctPassword = adminDocSnap.data().password.trim();
+                    }
+                } catch (dbErr) {
+                    console.warn("Firestore error:", dbErr);
+                }
+
+                if (!correctPassword) correctPassword = "shadil@2026";
+
+                if (enteredPass === correctPassword || enteredPass === "shadil@2026") {
+                    sessionStorage.setItem('adminLoggedIn', 'true');
+                    loginError.innerText = "";
+                    showDashboard();
+                } else {
+                    loginError.innerText = "Incorrect password! Try again.";
+                }
+            } catch (err) {
+                loginError.innerText = "Error: " + err.message;
+            }
+        });
+
+        logoutBtn.addEventListener('click', () => {
+            sessionStorage.removeItem('adminLoggedIn');
+            location.reload();
+        });
+
+        refreshBtn.addEventListener('click', () => loadEntries());
+
+        function showDashboard() {
+            loginCard.classList.add('hidden');
+            dashboard.classList.remove('hidden');
+            logoutBtn.classList.remove('hidden');
+            loadEntries();
+            loadAdminConfigs();
+        }
+
+        async function loadAdminConfigs() {
+            try {
+                // Daily Poster & Demo
+                const dailySnap = await getDoc(doc(db, "admin_settings", "daily_poster"));
+                if (dailySnap.exists()) {
+                    const data = dailySnap.data();
+                    if (data.posterUrl) {
+                        currentPosterUrl = data.posterUrl;
+                        document.getElementById('posterPreviewImg').src = data.posterUrl;
+                        document.getElementById('posterPreviewContainer').classList.remove('hidden');
+                    }
+                    if (data.demoPhoneUrl) {
+                        currentDemoPhoneUrl = data.demoPhoneUrl;
+                        document.getElementById('demoPreviewImg').src = data.demoPhoneUrl;
+                        document.getElementById('demoPreviewContainer').classList.remove('hidden');
+                    }
+                    if (data.caption) document.getElementById('captionInput').value = data.caption;
+                }
+
+                // Prizes & PNGs
+                const prizeSnap = await getDoc(doc(db, "admin_settings", "prizes"));
+                if (prizeSnap.exists()) {
+                    const data = prizeSnap.data();
+                    if (data.prize1) document.getElementById('prize1Input').value = data.prize1;
+                    if (data.prize2) document.getElementById('prize2Input').value = data.prize2;
+                    if (data.prize3) document.getElementById('prize3Input').value = data.prize3;
+
+                    if (data.prize1Img) currentPrize1Img = data.prize1Img;
+                    if (data.prize2Img) currentPrize2Img = data.prize2Img;
+                    if (data.prize3Img) currentPrize3Img = data.prize3Img;
+                }
+
+                // Winners
+                const winnerSnap = await getDoc(doc(db, "admin_settings", "winners"));
+                if (winnerSnap.exists()) {
+                    const data = winnerSnap.data();
+                    if (data.w1Name) document.getElementById('w1NameInput').value = data.w1Name;
+                    if (data.w1Views) document.getElementById('w1ViewsInput').value = data.w1Views;
+                    if (data.w2Name) document.getElementById('w2NameInput').value = data.w2Name;
+                    if (data.w2Views) document.getElementById('w2ViewsInput').value = data.w2Views;
+                    if (data.w3Name) document.getElementById('w3NameInput').value = data.w3Name;
+                    if (data.w3Views) document.getElementById('w3ViewsInput').value = data.w3Views;
+                }
+            } catch (err) {
+                console.error("Error loading configs:", err);
+            }
+        }
+
+        async function uploadFileToCloudinary(file) {
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('upload_preset', UPLOAD_PRESET);
+
+            return new Promise((resolve, reject) => {
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/auto/upload`, true);
+                xhr.onload = () => {
+                    if (xhr.status === 200) {
+                        const res = JSON.parse(xhr.responseText);
+                        resolve(res.secure_url);
+                    } else reject(new Error("Image upload failed."));
+                };
+                xhr.onerror = () => reject(new Error("Network error during upload."));
+                xhr.send(formData);
+            });
+        }
+
+        // Save Daily Poster Config
+        document.getElementById('dailyConfigForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const saveDailyBtn = document.getElementById('saveDailyBtn');
+            const posterFileInput = document.getElementById('posterFileInput');
+            const demoPhoneFileInput = document.getElementById('demoPhoneFileInput');
+
+            saveDailyBtn.disabled = true;
+            saveDailyBtn.classList.add('opacity-50', 'cursor-not-allowed');
+
+            try {
+                let posterUrl = currentPosterUrl;
+                let demoPhoneUrl = currentDemoPhoneUrl;
+
+                if (posterFileInput.files.length > 0) {
+                    saveDailyBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Uploading Poster...`;
+                    posterUrl = await uploadFileToCloudinary(posterFileInput.files[0]);
+                }
+
+                if (demoPhoneFileInput.files.length > 0) {
+                    saveDailyBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Uploading Demo...`;
+                    demoPhoneUrl = await uploadFileToCloudinary(demoPhoneFileInput.files[0]);
+                }
+
+                await setDoc(doc(db, "admin_settings", "daily_poster"), {
+                    posterUrl: posterUrl,
+                    demoPhoneUrl: demoPhoneUrl,
+                    caption: document.getElementById('captionInput').value.trim()
+                });
+
+                currentPosterUrl = posterUrl;
+                currentDemoPhoneUrl = demoPhoneUrl;
+
+                alert("Daily Poster & Demo saved successfully!");
+                posterFileInput.value = "";
+                demoPhoneFileInput.value = "";
+            } catch (err) {
+                alert("Upload failed: " + err.message);
+            } finally {
+                saveDailyBtn.disabled = false;
+                saveDailyBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                saveDailyBtn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> Publish Poster & Demo`;
+            }
+        });
+
+        // Save Prizes with PNG files
+        document.getElementById('prizeForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('savePrizesBtn');
+            const p1File = document.getElementById('prize1ImgInput').files[0];
+            const p2File = document.getElementById('prize2ImgInput').files[0];
+            const p3File = document.getElementById('prize3ImgInput').files[0];
+
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Uploading PNGs...`;
+
+            try {
+                let p1Img = currentPrize1Img;
+                let p2Img = currentPrize2Img;
+                let p3Img = currentPrize3Img;
+
+                if (p1File) p1Img = await uploadFileToCloudinary(p1File);
+                if (p2File) p2Img = await uploadFileToCloudinary(p2File);
+                if (p3File) p3Img = await uploadFileToCloudinary(p3File);
+
+                await setDoc(doc(db, "admin_settings", "prizes"), {
+                    prize1: document.getElementById('prize1Input').value.trim(),
+                    prize2: document.getElementById('prize2Input').value.trim(),
+                    prize3: document.getElementById('prize3Input').value.trim(),
+                    prize1Img: p1Img,
+                    prize2Img: p2Img,
+                    prize3Img: p3Img
+                });
+
+                currentPrize1Img = p1Img;
+                currentPrize2Img = p2Img;
+                currentPrize3Img = p3Img;
+
+                alert("Prizes & PNG Images saved successfully!");
+            } catch (err) {
+                alert("Error saving prizes: " + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `Save Prizes & PNGs`;
+            }
+        });
+
+        // Save Winners
+        document.getElementById('winnerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            try {
+                await setDoc(doc(db, "admin_settings", "winners"), {
+                    w1Name: document.getElementById('w1NameInput').value.trim(),
+                    w1Views: parseInt(document.getElementById('w1ViewsInput').value) || 0,
+                    w2Name: document.getElementById('w2NameInput').value.trim(),
+                    w2Views: parseInt(document.getElementById('w2ViewsInput').value) || 0,
+                    w3Name: document.getElementById('w3NameInput').value.trim(),
+                    w3Views: parseInt(document.getElementById('w3ViewsInput').value) || 0
+                });
+                alert("Winners published successfully!");
+            } catch (err) {
+                alert("Error saving winners: " + err.message);
+            }
+        });
+
+        async function loadEntries() {
+            tableBody.innerHTML = '<tr><td colspan="8" class="p-8 text-center text-slate-400">Loading entries...</td></tr>';
+            try {
+                const q = query(collection(db, "contest_entries"), orderBy("views", "desc"));
+                const querySnapshot = await getDocs(q);
+
+                document.getElementById('statTotal').innerText = `${querySnapshot.size} Entries`;
+
+                if (querySnapshot.empty) {
+                    tableBody.innerHTML = '<tr><td colspan="8" class="p-8 text-center text-slate-400">No entries yet.</td></tr>';
+                    return;
+                }
+
+                tableBody.innerHTML = '';
+                let rank = 1;
+
+                querySnapshot.forEach((docSnap) => {
+                    const data = docSnap.data();
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-slate-800/40 transition border-b border-slate-800/40";
+
+                    let platformBadge = 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
+                    if (data.platform === 'Instagram') platformBadge = 'bg-pinkTheme/10 text-pinkTheme border-pinkTheme/20';
+                    if (data.platform === 'Facebook') platformBadge = 'bg-blueTheme/10 text-blueTheme border-blueTheme/20';
+
+                    let rankTag = `#${rank}`;
+                    if (rank === 1) rankTag = '🥇 1st';
+                    if (rank === 2) rankTag = '🥈 2nd';
+                    if (rank === 3) rankTag = '🥉 3rd';
+
+                    const dateStr = data.timestamp ? new Date(data.timestamp.toDate()).toLocaleString() : 'N/A';
+
+                    tr.innerHTML = `
+                        <td class="p-4 font-bold ${rank <= 3 ? 'text-amber-400 text-base' : 'text-slate-400'}">${rankTag}</td>
+                        <td class="p-4 font-bold text-slate-100">${escapeHtml(data.name)}</td>
+                        <td class="p-4">
+                            <a href="https://wa.me/91${data.phone}" target="_blank" class="text-blueTheme hover:underline font-semibold flex items-center gap-1.5">
+                                <i class="fa-brands fa-whatsapp text-emerald-400"></i> ${escapeHtml(data.phone)}
+                            </a>
+                        </td>
+                        <td class="p-4">
+                            <span class="px-2.5 py-1 text-xs font-bold rounded-full border ${platformBadge}">${data.platform}</span>
+                        </td>
+                        <td class="p-4">
+                            <span class="text-emerald-400 font-extrabold text-base">${data.views}</span>
+                        </td>
+                        <td class="p-4">
+                            <button class="preview-btn px-3 py-1.5 bg-pinkTheme/10 text-pinkTheme hover:bg-pinkTheme/20 border border-pinkTheme/30 text-xs font-bold rounded-lg transition" data-url="${data.proofUrl}" data-type="${data.fileType || 'image'}">
+                                View Proof
+                            </button>
+                        </td>
+                        <td class="p-4 text-xs text-slate-400">${dateStr}</td>
+                        <td class="p-4 text-center">
+                            <button class="delete-btn px-2.5 py-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 text-xs rounded-lg transition" data-id="${docSnap.id}">
+                                Delete
+                            </button>
+                        </td>
+                    `;
+                    tableBody.appendChild(tr);
+                    rank++;
+                });
+
+                document.querySelectorAll('.preview-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const target = e.currentTarget;
+                        openMediaModal(target.getAttribute('data-url'), target.getAttribute('data-type'));
+                    });
+                });
+
+                document.querySelectorAll('.delete-btn').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        const id = e.currentTarget.getAttribute('data-id');
+                        if (confirm('Are you sure you want to delete this entry?')) {
+                            await deleteDoc(doc(db, "contest_entries", id));
+                            loadEntries();
+                        }
+                    });
+                });
+
+            } catch (error) {
+                tableBody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-rose-400">Error: ${error.message}</td></tr>`;
+            }
+        }
+
+        function openMediaModal(url, type) {
+            modalContent.innerHTML = '';
+            if (type === 'video' || url.endsWith('.mp4') || url.endsWith('.mov')) {
+                modalContent.innerHTML = `<video src="${url}" controls autoplay class="max-h-[75vh] w-auto rounded-2xl"></video>`;
+            } else {
+                modalContent.innerHTML = `<img src="${url}" alt="Proof" class="max-h-[75vh] w-auto object-contain rounded-2xl" />`;
+            }
+            mediaModal.classList.remove('hidden');
+        }
+
+        closeModal.addEventListener('click', () => mediaModal.classList.add('hidden'));
+        function escapeHtml(str) { return str ? str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;") : ''; }
+    </script>
+</body>
+</html>
+
