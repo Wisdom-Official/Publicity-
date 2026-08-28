@@ -121,9 +121,9 @@
                 </div>
 
                 <div class="space-y-2">
-                    <a id="downloadPosterBtn" href="#" download="Today_Status_Poster.jpg" target="_blank" class="w-full py-3 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black text-xs rounded-xl transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20">
+                    <button id="downloadPosterBtn" class="w-full py-3 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black text-xs rounded-xl transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20">
                         <i class="fa-solid fa-download"></i> Download Poster Image
-                    </a>
+                    </button>
                     <div id="captionContainer" class="hidden">
                         <div class="flex items-center justify-between text-xs bg-slate-950 border border-slate-800 p-2.5 rounded-xl">
                             <span id="captionText" class="truncate text-slate-300 pr-2"></span>
@@ -139,11 +139,11 @@
             <div class="space-y-4 flex flex-col justify-between border-t md:border-t-0 md:border-l border-slate-800 pt-6 md:pt-0 md:pl-6">
                 <div>
                     <span class="px-3 py-1 bg-pinkTheme/10 text-pinkTheme border border-pinkTheme/30 text-xs font-bold rounded-full">
-                        📱 Todaay Poster
+                        📱 Today Poster
                     </span>
                     <h3 class="text-xl font-bold text-white mt-2">2. Put Status & Win Prizes! </h3>
                     <p class="text-xs text-slate-400 mt-1">
-                        </p>
+                    </p>
                 </div>
 
                 <!-- Smartphone Visual Frame -->
@@ -457,6 +457,50 @@
         closeTermsModal.addEventListener('click', () => termsModal.classList.add('hidden'));
         acceptTermsBtn.addEventListener('click', () => termsModal.classList.add('hidden'));
 
+        let currentPosterUrl = '';
+
+        // Instant Download Logic for Poster
+        const downloadPosterBtn = document.getElementById('downloadPosterBtn');
+        downloadPosterBtn.addEventListener('click', async () => {
+            const imgElement = document.getElementById('dailyPosterImg');
+            const posterUrl = currentPosterUrl || imgElement.src;
+
+            if (!posterUrl || posterUrl.includes('placeholder.com')) {
+                alert("പോസ്റ്റർ ഇതുവരെ ലഭ്യമായിട്ടില്ല!");
+                return;
+            }
+
+            const originalBtnContent = downloadPosterBtn.innerHTML;
+            downloadPosterBtn.disabled = true;
+            downloadPosterBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Downloading...`;
+
+            try {
+                // Fetch image blob to force direct device download without opening new browser tab
+                const response = await fetch(posterUrl);
+                const blob = await response.blob();
+                const blobUrl = URL.createObjectURL(blob);
+                
+                const tempLink = document.createElement('a');
+                tempLink.href = blobUrl;
+                tempLink.download = 'Teenspace_Poster.jpg';
+                document.body.appendChild(tempLink);
+                tempLink.click();
+                document.body.removeChild(tempLink);
+                
+                setTimeout(() => URL.revokeObjectURL(blobUrl), 200);
+            } catch (err) {
+                console.warn("Direct blob download failed, opening directly:", err);
+                const tempLink = document.createElement('a');
+                tempLink.href = posterUrl;
+                tempLink.target = '_blank';
+                tempLink.download = 'Teenspace_Poster.jpg';
+                tempLink.click();
+            } finally {
+                downloadPosterBtn.disabled = false;
+                downloadPosterBtn.innerHTML = originalBtnContent;
+            }
+        });
+
         // Load Dynamic Data
         async function loadCampaignData() {
             try {
@@ -465,8 +509,8 @@
                 if (dailySnap.exists()) {
                     const data = dailySnap.data();
                     if (data.posterUrl) {
+                        currentPosterUrl = data.posterUrl;
                         document.getElementById('dailyPosterImg').src = data.posterUrl;
-                        document.getElementById('downloadPosterBtn').href = data.posterUrl;
                     }
                     if (data.demoPhoneUrl) {
                         document.getElementById('demoPhoneImg').src = data.demoPhoneUrl;
@@ -695,4 +739,5 @@
         });
     </script>
 </body>
-  </html>
+</html>
+
