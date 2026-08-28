@@ -116,8 +116,9 @@
                     </p>
                 </div>
 
-                <div class="bg-slate-950 border border-slate-800 rounded-2xl p-3 flex items-center justify-center min-h-[220px]">
-                    <img id="dailyPosterImg" src="https://via.placeholder.com/600x800?text=Poster+Loading..." alt="Today Poster" class="max-h-64 object-contain rounded-xl shadow-lg">
+                <!-- Poster Box with Responsive Height & Auto Fitting -->
+                <div class="bg-slate-950 border border-slate-800 rounded-2xl p-3 flex items-center justify-center min-h-[260px] overflow-hidden">
+                    <img id="dailyPosterImg" src="https://via.placeholder.com/600x800?text=Poster+Loading..." alt="Today Poster" class="w-full h-full max-h-72 object-contain rounded-xl shadow-lg transition-transform duration-300 hover:scale-[1.02]">
                 </div>
 
                 <div class="space-y-2">
@@ -139,18 +140,19 @@
             <div class="space-y-4 flex flex-col justify-between border-t md:border-t-0 md:border-l border-slate-800 pt-6 md:pt-0 md:pl-6">
                 <div>
                     <span class="px-3 py-1 bg-pinkTheme/10 text-pinkTheme border border-pinkTheme/30 text-xs font-bold rounded-full">
-                        📱 Today Poster
+                        📱 Today Poster Preview
                     </span>
                     <h3 class="text-xl font-bold text-white mt-2">2. Put Status & Win Prizes! </h3>
                     <p class="text-xs text-slate-400 mt-1">
+                        പോസ്റ്റർ കാണാൻ ഫോൺ സ്ക്രീനിലെ മാതൃക ശ്രദ്ധിക്കുക.
                     </p>
                 </div>
 
-                <!-- Smartphone Visual Frame -->
-                <div class="mx-auto w-full max-w-[200px] bg-slate-950 border-4 border-slate-800 rounded-[32px] p-2 shadow-2xl relative overflow-hidden my-2">
-                    <div class="w-16 h-3 bg-slate-800 rounded-full mx-auto mb-2"></div>
-                    <div class="rounded-2xl overflow-hidden bg-slate-900 aspect-[9/16] flex items-center justify-center">
-                        <img id="demoPhoneImg" src="https://via.placeholder.com/300x530?text=Phone+Demo" alt="Phone Demo" class="w-full h-full object-cover">
+                <!-- Smartphone Visual Frame (Adjusted to Fit Image Perfectly) -->
+                <div class="mx-auto w-full max-w-[210px] bg-slate-950 border-[5px] border-slate-800 rounded-[36px] p-2 shadow-2xl relative overflow-hidden my-2 border-t-[8px]">
+                    <div class="w-16 h-2.5 bg-slate-800 rounded-full mx-auto mb-2"></div>
+                    <div class="rounded-2xl overflow-hidden bg-slate-900 aspect-[9/16] w-full flex items-center justify-center relative shadow-inner border border-slate-800">
+                        <img id="demoPhoneImg" src="https://via.placeholder.com/300x530?text=Phone+Demo" alt="Phone Demo" class="w-full h-full object-cover object-center rounded-xl transition-all duration-300">
                     </div>
                 </div>
 
@@ -511,6 +513,10 @@
                     if (data.posterUrl) {
                         currentPosterUrl = data.posterUrl;
                         document.getElementById('dailyPosterImg').src = data.posterUrl;
+                        // Set phone demo image to poster if specific demo URL is not configured
+                        if (!data.demoPhoneUrl) {
+                            document.getElementById('demoPhoneImg').src = data.posterUrl;
+                        }
                     }
                     if (data.demoPhoneUrl) {
                         document.getElementById('demoPhoneImg').src = data.demoPhoneUrl;
